@@ -1,7 +1,7 @@
 {
-    "keywords": ["prs mini"],
-    "brand": "chrome-hearts",
-    "categories": ["ring"],
+    "keywords": [],
+    "brand": "",
+    "categories": [],
     "colors": {
         "white": false,
         "gray": false,
@@ -19,5 +19,5 @@
         "gold": false,
         "others": false
     },
-    "discord_webhook_url": ""
+    "discord_webhook_url": "https://discord.com/api/webhooks/1262845773004144772/OeoKqszLjDSLy6Cnxk8yC_0JxQKB1jshFrBC5xAE8isxoI4XKAJsmyHo_YGte_RNqTDj"
 }
