@@ -109,7 +109,7 @@ const productMatchesKeywords = (product) => {
 
 // Check if product is new (was created after last tick)
 const productIsNew = (product) => {
-  return new Date(product.created_at).getTime() > lastTickDate;
+  return new Date(product.created_at).getTime() < lastTickDate;
 };
 
 const sendWebhook = async (product) => {
