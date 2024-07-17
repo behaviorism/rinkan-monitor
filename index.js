@@ -60,7 +60,7 @@ var lastTickDate;
 
 const tickFunction = async () => {
   try {
-    lastTickDate = Date.now();
+    currentDate = Date.now();
 
     const response = await fetch(
       `${SEARCH_API_ENDPOINT}?${parameters.toString()}`,
@@ -89,6 +89,8 @@ const tickFunction = async () => {
       // Delay to prevent discord webhook rate limit
       await wait(500);
     }
+
+    lastTickDate = currentDate;
   } catch (error) {
     console.log(`Monitor error: ${error.message}`);
   }
