@@ -22,7 +22,7 @@ const COLORS_MAP = {
 const SEARCH_API_ENDPOINT = "https://api.rinkan-online.com/api/search";
 const RINKAN_PRODUCT_PAGE = "https://rinkan-online.com/products";
 
-const TICK_RATE = 60 * 1000; // 1 minute
+const TICK_RATE = 5 * 60 * 1000; // 5 minutes
 
 const { keywords, colors, categories, brand, discord_webhook_url } = JSON.parse(
   fs.readFileSync("config.json", "utf-8")
@@ -56,7 +56,7 @@ for (let category of categories) {
   parameters.append("category", category);
 }
 
-var lastTickDate;
+var lastTickDate = Date.now();
 
 const tickFunction = async () => {
   try {
