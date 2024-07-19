@@ -58,42 +58,63 @@ for (let category of categories) {
 
 var lastTickDate = Date.now();
 
+const init = async () => {
+  while (true) {
+    let start = Date.now();
+
+    await tickFunction();
+
+    let timeUntilNextTick = TICK_RATE - (Date.now() - start);
+
+    await wait(timeUntilNextTick);
+  }
+};
+
 const tickFunction = async () => {
   try {
     currentDate = Date.now();
 
-    const response = await fetch(
-      `${SEARCH_API_ENDPOINT}?${parameters.toString()}`,
-      { keepalive: true }
-    );
+    // We keep looping pages until we find a product that was created before the current ticx.
+    // As items are sorted by latest, all items after that product will certainly be irrelevant.
+    pageLoop: for (i = 1; ; i++) {
+      let products = await fetchProducts(i);
 
-    if (!response.ok) {
-      throw new Error(response.status);
-    }
+      for (let product of products) {
+        // If a product was created before the current tick, stop looping products and pages
+        if (!productIsNew(product)) {
+          break pageLoop;
+        }
 
-    const products = (await response.json()).products;
+        // If not using search function, check if product matches keyword.
+        // If it doesn't, return early
+        if (!useSearchFunction && !productMatchesKeywords(product)) {
+          continue;
+        }
 
-    for (let product of products) {
-      // If not using search function, check if product matches keyword.
-      // If it doesn't, return early
-      if (!useSearchFunction && !productMatchesKeywords(product)) {
-        continue;
+        await sendWebhook(product);
+
+        // Delay to prevent discord webhook rate limit
+        await wait(2000);
       }
-
-      if (!productIsNew(product)) {
-        continue;
-      }
-
-      await sendWebhook(product);
-
-      // Delay to prevent discord webhook rate limit
-      await wait(500);
     }
 
     lastTickDate = currentDate;
   } catch (error) {
     console.log(`Monitor error: ${error.message}`);
   }
+};
+
+const fetchProducts = async (page) => {
+  const response = await fetch(
+    `${SEARCH_API_ENDPOINT}?${parameters.toString()}&page=${page}`,
+    { keepalive: true }
+  );
+
+  if (!response.ok) {
+    throw new Error(response.status);
+  }
+
+  return (await response.json()).products;
 };
 
 // Check if product matches at least one keyword
@@ -159,7 +180,4 @@ const sendWebhook = async (product) => {
 const wait = (milliseconds) =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-tickFunction();
-
-// Monitor interval
-setInterval(tickFunction, TICK_RATE);
+init();
