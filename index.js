@@ -35,7 +35,6 @@ const useSearchFunction = keywords.length === 1;
 // Create inital request with default params
 let parameters = new URLSearchParams({
   sort: "latest",
-  stockLimit: 1, // in stock
 });
 
 if (brand) {
@@ -56,7 +55,7 @@ for (let category of categories) {
   parameters.append("category", category);
 }
 
-var lastTickDate = Date.now();
+var lastTickDate = Date.now() - 150 * 60 * 1000;
 
 const init = async () => {
   while (true) {
@@ -85,6 +84,12 @@ const tickFunction = async () => {
           break pageLoop;
         }
 
+        // Products posted early are ignored when using api's stock limit parameter.
+        // Therefore, stock is checked.
+        if (product.stock === 0) {
+          continue;
+        }
+
         // If not using search function, check if product matches keyword.
         // If it doesn't, return early
         if (!useSearchFunction && !productMatchesKeywords(product)) {
@@ -107,7 +112,7 @@ const tickFunction = async () => {
 const fetchProducts = async (page) => {
   const response = await fetch(
     `${SEARCH_API_ENDPOINT}?${parameters.toString()}&page=${page}`,
-    { keepalive: true }
+    { keepalive: true, cache: "no-cache" }
   );
 
   if (!response.ok) {
