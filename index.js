@@ -84,7 +84,8 @@ const tickFunction = async () => {
           break pageLoop;
         }
 
-        // Products posted early are ignored when using api's stock limit parameter.
+        // Products posted early don't have the stock property and are therefore considered out of stock
+        // when using the api's stockLimit parameter.
         // Therefore, stock is checked.
         if (product.stock === 0) {
           continue;
