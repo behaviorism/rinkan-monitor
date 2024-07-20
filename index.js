@@ -55,7 +55,7 @@ for (let category of categories) {
   parameters.append("category", category);
 }
 
-var lastTickDate = Date.now() - 150 * 60 * 1000;
+var lastTickDate = Date.now();
 
 const init = async () => {
   while (true) {
